@@ -56,7 +56,7 @@ class FileUploadManager : NSObject {
         self.uploadTask?.cancel()
     }
     
-    func uploadFile(mimeType:String = "image/png",fileName:String = "\(UUID().uuidString).png",completionHandler: @escaping (Data , [String:Any]?, Error?, Bool) -> Void)
+    func uploadFile(mimeType:String = "image/png",fileName:String = "\(ProcessInfo().globallyUniqueString).png",completionHandler: @escaping (Data , [String:Any]?, Error?, Bool) -> Void)
     {
         if let galleyImgData = imgData {
             self.uploadStatus = .uploading
