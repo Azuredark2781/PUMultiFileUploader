@@ -15,7 +15,7 @@ extension UIViewController
 }
 class ViewController: UIViewController {
     @IBOutlet weak var tblDoc: UITableView!
-    var ImgsUploadArr = [FileUploadManager]()
+    var arrUploadContents = [FileUploadManager]()
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tblDoc.register(UINib(nibName: "UploadingDocCell", bundle: nil), forCellReuseIdentifier: "UploadingDocCell")
@@ -25,7 +25,7 @@ class ViewController: UIViewController {
         let vc = FilePickerVC(nibName: "FilePickerVC", bundle: nil)
         vc.modalPresentationStyle = .overCurrentContext
         vc.didselectFileArr = {(selectedFiles) in
-            self.ImgsUploadArr = selectedFiles
+            self.arrUploadContents = selectedFiles
             self.tblDoc.reloadData()
         }
         self.present(vc, animated: false, completion: nil)
@@ -37,26 +37,25 @@ extension ViewController: UITableViewDelegate,UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-       return self.ImgsUploadArr.count
+       return self.arrUploadContents.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "UploadingDocCell", for: indexPath) as? UploadingDocCell else { return UITableViewCell() }
-             if self.ImgsUploadArr.count > 0 {
-                let fileUpload = self.ImgsUploadArr[indexPath.row]
-                 cell.imgSelected.image = UIImage.init(data: fileUpload.imgData ?? Data())
-                 cell.lblDocname.text = fileUpload.imgname ?? ""
+             if self.arrUploadContents.count > 0 {
+                let uploadContent = self.arrUploadContents[indexPath.row]
+                 cell.imgSelected.image = UIImage.init(data: uploadContent.imgData ?? Data())
+                 cell.lblDocname.text = uploadContent.imgname ?? ""
                  
                  cell.uploadProgress.isHidden = false
-                fileUpload.progressBlock = { (pro) in
-                    print( "\(fileUpload.imgname ?? "") -  \(Float(pro ?? 0.0))")
+                uploadContent.progressBlock = { (pro) in
                     cell.uploadProgress.progress = Float(pro ?? 0.0)
-                    let prgress = (Float(pro ?? 0.0) )/100
-                    cell.lblStatus.text = fileUpload.uploadStatus == .uploading ? "Uploading \(prgress)" : ""
+                    let progressval = (Float(pro ?? 0.0) )/100
+                    cell.lblStatus.text = uploadContent.uploadStatus == .uploading ? "Uploading \(progressval)" : ""
               }
-              fileUpload.uploadImgFile { (fileUploadGet, response, error, status) in
+              uploadContent.uploadFile { (getUploadRepo, response, error, status) in
                   do {
                       let jsonDecoder = JSONDecoder()
-                      let uploadModel = try jsonDecoder.decode(UploadFileModel.self, from:  fileUploadGet)
+                      let uploadModel = try jsonDecoder.decode(UploadFileModel.self, from:  getUploadRepo)
                       
                       if uploadModel.code == 1 {
                           cell.uploadProgress.isHidden = true
